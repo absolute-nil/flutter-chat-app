@@ -6,42 +6,108 @@ class AuthForm extends StatefulWidget {
 }
 
 class _AuthFormState extends State<AuthForm> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  var _isLogin = true;
+  String _userEmail = '';
+  String _userName = '';
+  String _userPassword = '';
+
+  void _trySubmit() {
+    final isValid = _formKey.currentState.validate();
+    // changes the focus (it will collapse the keyboard)
+    FocusScope.of(context).unfocus();
+
+    if (isValid) {
+      // this will set the values of the variables
+      _formKey.currentState.save();
+
+      print(_userEmail);
+      print(_userName);
+      print(_userPassword);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Card(
         margin: EdgeInsets.all(20),
         child: SingleChildScrollView(
-          child: Padding(padding: EdgeInsets.all(16),
-            child: Form(child: Form(
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: Form(
+              key: _formKey,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   TextFormField(
+                    key: ValueKey('email'),
+                    validator: (value) {
+                      if (value.isEmpty || !value.contains('@')) {
+                        return 'Please enter a valid email address';
+                      }
+                      return null;
+                    },
                     keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
-                      labelText: 'Email address'
-                    ),
+                    decoration: InputDecoration(labelText: 'Email address'),
+                    onSaved: (value) {
+                      _userEmail = value;
+                    },
                   ),
-                  TextFormField(
-                    decoration: InputDecoration(
-                      labelText: 'Username'
+                  if (!_isLogin)
+                    TextFormField(
+                      key: ValueKey('username'),
+                      validator: (value) {
+                        if (value.isEmpty || value.length < 4) {
+                          return 'please enter atleast 4 characters';
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(labelText: 'Username'),
+                      onSaved: (value) {
+                        _userName = value;
+                      },
                     ),
-                  ),
                   TextFormField(
-                    decoration: InputDecoration(
-                      labelText: 'password'
-                    ),
+                    key: ValueKey('password'),
+                    validator: (value) {
+                      if (value.isEmpty || value.length < 7) {
+                        return 'Password must be at least 7 character long';
+                      }
+                      return null;
+                    },
+                    decoration: InputDecoration(labelText: 'password'),
                     obscureText: true,
+                    onSaved: (value) {
+                      _userPassword = value;
+                    },
                   ),
-                  SizedBox(height: 12,),
-                  RaisedButton(child: Text('Login'), onPressed: (){}),
-                  FlatButton(onPressed: (){}, child: Text('create new account'))
+                  SizedBox(
+                    height: 12,
+                  ),
+                  RaisedButton(
+                      child: Text(
+                        _isLogin ? 'Login' : 'Signup',
+                      ),
+                      onPressed: _trySubmit),
+                  FlatButton(
+                    textColor: Theme.of(context).primaryColor,
+                    child: Text(_isLogin
+                        ? 'create new account'
+                        : 'I already have an account'),
+                    onPressed: () {
+                      print(_isLogin);
+                      setState(() {
+                        _isLogin = !_isLogin;
+                      });
+                      print(_isLogin);
+                    },
+                  )
                 ],
               ),
-            ),),)
-
-          ,),
+            ),
+          ),
+        ),
       ),
     );
   }
