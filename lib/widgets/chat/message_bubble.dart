@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 
 class MessageBubble extends StatelessWidget {
   final String message;
-  final String userId;
+  final String username;
   final bool isMe;
   final Key key;
 
-  MessageBubble(this.message, this.userId, this.isMe, {this.key});
+  MessageBubble(this.message, this.username, this.isMe, {this.key});
 
   @override
   Widget build(BuildContext context) {
@@ -31,28 +31,17 @@ class MessageBubble extends StatelessWidget {
                 crossAxisAlignment:
                     isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                 children: [
-                  FutureBuilder(
-                      future: Firestore.instance
-                          .collection('users')
-                          .document(userId)
-                          .get(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Text('Loading...');
-                        }
-                        return Text(
-                          snapshot.data['username'],
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: isMe
-                                  ? Colors.black
-                                  : Theme.of(context)
-                                      .accentTextTheme
-                                      .headline1
-                                      .color),
-                        );
-                      }),
+                  Text(
+                    username,
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: isMe
+                            ? Colors.black
+                            : Theme.of(context)
+                                .accentTextTheme
+                                .headline1
+                                .color),
+                  ),
                   Text(
                     message,
                     textAlign: isMe ? TextAlign.end : TextAlign.start,
